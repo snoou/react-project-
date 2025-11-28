@@ -1,43 +1,60 @@
 .size {
     font-family: "Vazirmatn", sans-serif;
     padding: 24px;
-    max-width: 768px;
+    max-width: 800px;
     margin: auto;
     border-radius: 16px;
     background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.size h2 {
+.toman {
+    display: none;
+}
+
+.transaction {
     text-align: center;
     font-weight: 600;
     font-size: 20px;
-    margin-bottom: 24px;
 }
 
-.div-table {
+.header {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.button-transaction {
+    background-color: rgba(14, 51, 243, 1);
+    border: 0;
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 .title {
     display: grid;
-    grid-template-columns: 160px 160px 160px 160px;
+    grid-template-columns: 1fr 1fr 1fr 2fr 40px;
     font-weight: bold;
     color: #6B7580;
     border-bottom: 1px solid #A0CCF8;
     padding: 10px 5px;
+    font-size: 14px;
 }
 
 .info {
     display: grid;
-    grid-template-columns: 160px 160px 160px 160px 20px;
+    grid-template-columns: 1fr 1fr 1fr 2fr 40px;
     align-items: center;
     padding: 15px 5px;
-}
-
-.info>div {
-    text-align: right;
+    font-size: 14px;
 }
 
 .transaction-income {
@@ -52,92 +69,90 @@
     text-align: center;
 }
 
-.header {
+.not {
     display: flex;
-    justify-content: space-between;
-}
-
-.header button {
-    width: 199px;
-    height: 48px;
-    border-radius: 8px;
-    background-color: rgba(14, 51, 243, 1);
-    border: 0;
-    color: white;
-    font-size: 20px;
-    font-weight: 400;
-    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    height: 200px;
+    color: #6B7580;
     gap: 10px;
 }
 
-.not {
-    height: 875px;
-    width: 100%;
+.delete-btn {
+    cursor: pointer;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: rgba(107, 117, 128, 1);
+    justify-content: flex-end;
 }
 
 @media (max-width: 768px) {
     .header {
-        width: 332px;
+        gap: 15px;
+
     }
 
-    .size {
-        width: 360px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
+    .toman {
+        display: inline;
+        margin-right: 4px;
     }
+
+    .transaction {
+        text-align: right;
+    }
+
+
 
     .title {
         display: none;
     }
 
-    .not {
-        width: 310px;
+    .info-parent {
+        border-bottom: none;
+        margin-bottom: 12px;
     }
 
     .info {
         display: grid;
         background-color: #FAFAFB;
-        margin: 10px 0;
-        padding: 14px 16px;
-        border-radius: 8px;
-        border-bottom: none;
-        width: 322px;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        padding: 16px;
+        border-radius: 12px;
+        grid-template-columns: 1fr auto;
         grid-template-areas:
-            "date amount"
-            "desc status";
+            "desc amount"
+            "date delete";
+        gap: 10px;
     }
 
     .transaction-date {
         grid-area: date;
+
+        text-align: right !important;
+        font-weight: bold;
         color: #242D35;
-        font-size: 0.9em;
-        text-align: left;
+        white-space: normal !important;
     }
 
     .transaction-income,
     .transaction-expense {
         grid-area: amount;
-        text-align: right;
-        font-weight: bold;
-        font-size: 1.1em;
+        text-align: left !important;
+        font-size: 16px;
+        font-weight: 700;
+        align-self: start;
     }
 
     .transaction-description {
         grid-area: desc;
-        text-align: right;
-        margin-top: 8px;
+
         color: #242D35;
+        font-size: 16px;
+        text-align: right !important;
+        align-self: end;
+    }
+
+    .delete-btn {
+        grid-area: delete;
+        justify-content: flex-end;
+        align-self: end;
     }
 }

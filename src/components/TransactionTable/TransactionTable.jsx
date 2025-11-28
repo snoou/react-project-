@@ -17,10 +17,13 @@ const TransactionTable = () => {
   return (
     <div className="size">
       <div className="header">
-        <h2>تراکنش‌ها</h2>
-        <button onClick={() => setIsModalOpen(true)}>
+        <h2 className="transaction font-size-list">تراکنش‌ها</h2>
+        <button className='button-transaction' onClick={() => setIsModalOpen(true)}>
           <img src={PlusIcon} alt="icon" />
-          افزودن تراکنش
+          <span className='font-size-list'>
+            افزودن تراکنش
+
+          </span>
         </button>
       </div>
       {transactions.length > 0 && (
@@ -39,21 +42,20 @@ const TransactionTable = () => {
           </div>
         ) : (
           transactions.map((tx) => (
-            <div className="info" key={tx.id}>
-              <div className="transaction-date">{ToPersian(tx.date)}</div>
-
-              <div className="transaction-income">
-                {tx.type === 'income' ? `${ToPersian(tx.amount)}+` : ''}
-              </div>
-              <div className="transaction-expense">
-                {tx.type === 'expense' ? `${ToPersian(tx.amount)}-` : ''}
-              </div>
-              <div className="transaction-description">{tx.description}</div>
-              <div
-                className="delete-btn left"
-                onClick={() => handleDelete(tx.id)}
-              >
-                <img src={Delete} alt="delete" />
+            <div className='info-parent'>
+              <div className="info" key={tx.id}>
+                <div className="transaction-date">{ToPersian(tx.date)}</div>
+                <div className={`${tx.type === 'expense' ? 'transaction-expense' : 'transaction-income'}`}>
+                  {`${ToPersian(tx.amount)}${tx.type === 'income' ? '+' : '-'}`}
+                  <span className='toman' >تومان</span>
+                </div>
+                <div className="transaction-description">{tx.description}</div>
+                <div
+                  className="delete-btn left"
+                  onClick={() => handleDelete(tx.id)}
+                >
+                  <img src={Delete} alt="delete" />
+                </div>
               </div>
             </div>
           ))
