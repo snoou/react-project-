@@ -1,6 +1,6 @@
 import './Dashboard.css'
 import Diagram from '../Diagram/Diagram';
-import UseContext from '../../utils/UseContext';
+import UseContext from '../../context/TransactionContext';
 const Dashboard = () => {
   const [income, expense] = UseContext()
   return (

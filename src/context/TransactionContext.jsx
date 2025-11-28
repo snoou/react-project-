@@ -1,4 +1,4 @@
-import { createContext, useReducer, useEffect } from "react";
+import { createContext, useReducer, useEffect ,useContext } from "react";
 import GetInitialTransactions from "../utils/GetInitialTransactions";
 export const TransactionContext = createContext();
 const transactionReducer = (state, action) => {
@@ -26,3 +26,15 @@ export const TransactionProvider = ({ children }) => {
         </TransactionContext.Provider>
     );
 };
+
+
+
+const UseContext = () => {
+    const context = useContext(TransactionContext);
+    const income = context.transactions.filter(tx => tx.type === "income")
+    const expense = context.transactions.filter(tx => tx.type === "expense")
+    const list = [income , expense]
+    return list
+}
+
+export default UseContext;

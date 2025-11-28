@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import TransactionTable from './components/TransactionTable/TransactionTable';
-import Layout from './components/Layout/Layout';
+import Layout from './Layout/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
 import NotFound from './components/NotFound/NotFound';
 import { TransactionProvider } from './context/TransactionContext';

@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
-import Logo from "../../assets/icon/monlogo.png";
-import TextLogo from "../../assets/icon/textLogo.png";
+import Logo from "../assets/icon/monlogo.png";
+import TextLogo from "../assets/icon/textLogo.png";
 import "./Layout.css";
 
 const Layout = () => {
