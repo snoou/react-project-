@@ -42,7 +42,7 @@ const TransactionTable = () => {
           </div>
         ) : (
           transactions.map((tx) => (
-            <div className='info-parent'>
+            <div className='info-parent' key={tx.id}>
               <div className="info" key={tx.id}>
                 <div className="transaction-date">{ToPersian(tx.date)}</div>
                 <div className={`${tx.type === 'expense' ? 'transaction-expense' : 'transaction-income'}`}>

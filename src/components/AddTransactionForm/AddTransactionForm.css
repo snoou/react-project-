@@ -12,33 +12,37 @@
   z-index: 999;
 }
 
-.modal {
+.modal-add {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   width: 420px;
+  max-width: 90%;
   padding: 16px 32px;
-  gap: 20px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
   font-family: "Vazirmatn", sans-serif;
-
 }
 
+.modal-add h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #222;
+  text-align: right;
+}
+
+
 .head {
+  display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .head img {
   cursor: pointer;
 }
 
-.modal h3 {
-  margin-bottom: 20px;
-  font-size: 18px;
-  text-align: right;
-  color: #222;
-}
 
 form {
   display: flex;
@@ -46,22 +50,33 @@ form {
   gap: 14px;
 }
 
+.modal-add-div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 label {
   font-size: 14px;
   color: #333;
   text-align: right;
-  display: inline-block;
-  width: 160px;
-}
-
-.type-t {
-  width: 277px;
+  width: 120px;
+  flex-shrink: 0;
 }
 
 input[type="date"],
 input[type="number"],
-input[type="text"] {
-  width: 312px;
+input[type="text"],
+.rmdp-container {
+  width: 100%;
+  flex-grow: 1;
+  box-sizing: border-box;
+}
+
+input[type="date"],
+input[type="number"],
+input[type="text"],
+.custom-date-input {
   height: 40px;
   border: 1px solid #d0d0d0;
   border-radius: 8px;
@@ -69,22 +84,36 @@ input[type="text"] {
   font-size: 14px;
   outline: none;
   transition: border 0.2s ease;
+  font-family: "Vazirmatn", sans-serif;
+  color: #333;
+  background-color: #fff;
 }
 
-input:focus {
+input:focus,
+.custom-date-input:focus {
   border-color: #4c8bf5;
+  box-shadow: none;
 }
 
-.modal div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.custom-date-input {
+  text-align: right;
+  position: relative;
+  background: url("../../assets/icon/Calendar.png") no-repeat left 10px center;
+  background-size: 20px;
+  padding-left: 40px;
+  padding-right: 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
-.modal div label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.custom-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
 .buttons {
@@ -97,10 +126,11 @@ input:focus {
 button {
   border: none;
   border-radius: 8px;
-  padding: 2px 20px;
+  padding: 8px 20px;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s ease;
+  font-family: "Vazirmatn", sans-serif;
 }
 
 button[type="submit"] {
@@ -121,7 +151,6 @@ button[type="button"]:hover {
   background-color: #e8e8e8;
 }
 
-
 .error {
   color: red;
   background-color: #ffe5e5;
@@ -129,43 +158,50 @@ button[type="button"]:hover {
   padding: 8px;
   margin-bottom: 10px;
   font-size: 14px;
-}
-
-
-.custom-date-input {
   text-align: right;
-  position: relative;
-  background: url("../../assets/icon/Calendar.png") no-repeat left 10px center;
-  background-size: 20px;
-  padding-left: 40px;
-  padding-right: 10px;
-  font-size: 14px;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
-.custom-date-input::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  position: absolute;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+.on-resposive {
+  display: none;
 }
+
 
 @media (max-width: 768px) {
-  .modal {
-    width: 348px;
-  }
-
-  .type-t {
-    width: 230px;
-  }
-
   .modal-overlay {
-    align-items: end;
+    align-items: flex-end;
   }
 
+  .modal-add {
+    width: 100%;
+    border-radius: 10px 10px 0 0;
+    padding: 20px 16px;
+  }
+
+  .off-resposive {
+    display: none;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .on-resposive {
+    display: block;
+  }
+
+  input[type="date"],
+  input[type="number"],
+  input[type="text"],
+  .custom-date-input,
+  .rmdp-container {
+    width: 100%;
+    flex-grow: 0;
+  }
+
+}
+
+.rmdp-container {
+  display: flex !important;
 }

@@ -2,7 +2,11 @@ import { useContext, useState } from "react";
 import './AddTransactionForm.css';
 import Id from '../../utils/Id';
 import VectorIcon from '../../assets/icon/Vector.png';
+import Line from '../../assets/icon/Line1.png'
 import { TransactionContext } from "../../context/TransactionContext";
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const AddTransactionForm = ({ onClose }) => {
   const { dispatch } = useContext(TransactionContext);
@@ -11,6 +15,7 @@ const AddTransactionForm = ({ onClose }) => {
   const [type, setType] = useState('income');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!date || !amount || !description) {
@@ -22,7 +27,7 @@ const AddTransactionForm = ({ onClose }) => {
       type: "ADD_TRANSACTION",
       payload: {
         id: Id(),
-        date,
+        date: date.toString(),
         amount: parseFloat(amount),
         type,
         description,
@@ -37,23 +42,31 @@ const AddTransactionForm = ({ onClose }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className='head'>
-          <h3>افزودن تراکنش</h3>
-          <img src={VectorIcon} alt="کنسل" onClick={onClose} />
+      <div className="modal-add">
+        <div className='head modal-add-div '>
+          <h3 className="off-resposive">افزودن تراکنش</h3>
+          <img className="off-resposive" src={VectorIcon} alt="کنسل" onClick={onClose} />
+          <img className="on-resposive" src={Line} alt="line" />
         </div>
         <form onSubmit={handleSubmit}>
           {error && <p className="error">{error}</p>}
-          <div className="row">
+          <div className="row modal-add-div">
             <label>تاریخ</label>
-            <input
-              type="date"
-              className="custom-date-input"
+
+            <DatePicker
+
+              calendar={persian}
+              locale={persian_fa}
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(val) => setDate(val)}
+              format="YYYY/MM/DD"
+              placeholder="انتخاب تاریخ"
+              inputClass="custom-date-input"
+              calendarPosition="bottom-right"
             />
+
           </div>
-          <div className="row">
+          <div className="row modal-add-div ">
             <label>مبلغ (تومان)</label>
             <input
               type="number"
@@ -61,9 +74,9 @@ const AddTransactionForm = ({ onClose }) => {
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
-          <div>
+          <div className="modal-add-div">
             <label>نوع تراکنش</label>
-            <div className="type-t">
+            <div className="type-t modal-add-div ">
               <label>
                 <input
                   type="radio"
@@ -86,7 +99,7 @@ const AddTransactionForm = ({ onClose }) => {
               </label>
             </div>
           </div>
-          <div className="row">
+          <div className="row modal-add-div ">
             <label>شرح</label>
             <input
               type="text"
@@ -94,7 +107,7 @@ const AddTransactionForm = ({ onClose }) => {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div className="buttons">
+          <div className="buttons modal-add-div ">
             <button type="button" onClick={onClose}>
               انصراف
             </button>
