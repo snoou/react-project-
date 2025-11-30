@@ -49,17 +49,13 @@ const Diagram = ({ income = [], expense = [] }) => {
     const aggregateData = (arr, targetArray) => {
       arr.forEach((i, index) => {
         const dtObject = safeDate(i?.date);
-
         if (!dtObject) {
           console.log(`Skipping transaction item at index ${index}. Date could not be parsed:`, i);
           return;
         }
-
         if (y && dtObject.year !== y) return;
-
         const monthIndex = dtObject.month - 1;
         const val = Number(i?.amount) || 0;
-
         if (monthIndex >= 0 && monthIndex < 12) {
           targetArray[monthIndex] += val;
         }

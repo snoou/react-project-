@@ -7,7 +7,7 @@ const Dashboard = () => {
     <>
       <div className="size">
         <div className=" dashbord">
-          <h2>داشبورد</h2>
+          <h2 className='dashbord-h2'>داشبورد</h2>
           <div className='header '>
             <Diagram income={income} expense={expense}></Diagram>
           </div>

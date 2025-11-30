@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import './AddTransactionForm.css';
 import Id from '../../utils/Id';
 import VectorIcon from '../../assets/icon/Vector.png';
@@ -8,13 +8,22 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 
-const AddTransactionForm = ({ onClose }) => {
+const AddTransactionForm = ({ onClose, initialData }) => {
   const { dispatch } = useContext(TransactionContext);
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('income');
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (initialData) {
+      setDate(initialData.date);
+      setAmount(initialData.amount);
+      setType(initialData.type);
+      setDescription(initialData.description);
+    }
+  }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,16 +32,31 @@ const AddTransactionForm = ({ onClose }) => {
       return;
     }
     setError('');
-    dispatch({
-      type: "ADD_TRANSACTION",
-      payload: {
-        id: Id(),
-        date: date.toString(),
-        amount: parseFloat(amount),
-        type,
-        description,
-      },
-    });
+
+    if (initialData) {
+      dispatch({
+        type: "EDIT_TRANSACTION",
+        payload: {
+          id: initialData.id,
+          date: date.toString(),
+          amount: parseFloat(amount),
+          type,
+          description,
+        },
+      });
+    } else {
+      dispatch({
+        type: "ADD_TRANSACTION",
+        payload: {
+          id: Id(),
+          date: date.toString(),
+          amount: parseFloat(amount),
+          type,
+          description,
+        },
+      });
+    }
+
     setDate('');
     setAmount('');
     setType('income');
@@ -44,7 +68,9 @@ const AddTransactionForm = ({ onClose }) => {
     <div className="modal-overlay">
       <div className="modal-add">
         <div className='head modal-add-div '>
-          <h3 className="off-resposive">افزودن تراکنش</h3>
+          <h3 className="off-resposive">
+            {initialData ? 'ویرایش تراکنش' : 'افزودن تراکنش'}
+          </h3>
           <img className="off-resposive" src={VectorIcon} alt="کنسل" onClick={onClose} />
           <img className="on-resposive" src={Line} alt="line" />
         </div>
@@ -62,7 +88,6 @@ const AddTransactionForm = ({ onClose }) => {
               inputClass="custom-date-input"
               calendarPosition="bottom-right"
             />
-
           </div>
           <div className="row modal-add-div ">
             <label>مبلغ (تومان)</label>
@@ -109,7 +134,7 @@ const AddTransactionForm = ({ onClose }) => {
             <button type="button" onClick={onClose}>
               انصراف
             </button>
-            <button type="submit">ثبت</button>
+            <button type="submit">{initialData ? 'ویرایش' : 'ثبت'}</button>
           </div>
         </form>
       </div>

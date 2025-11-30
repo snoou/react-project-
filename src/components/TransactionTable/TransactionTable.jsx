@@ -1,28 +1,65 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import './TransactionTable.css';
 import AddTransactionForm from '../AddTransactionForm/AddTransactionForm';
 import DangerIcon from '../../assets/icon/DangerCircle.png';
+import Delete from '../../assets/icon/Delete.png'
 import PlusIcon from '../../assets/icon/Plus.png';
-import Delete from '../../assets/icon/Delete.png';
+import Edit from '../../assets/icon/Edit.png'
 import ToPersian from '../../utils/ToPersian';
+import More from '../../assets/icon/More.png'
 import { TransactionContext } from '../../context/TransactionContext';
 
 const TransactionTable = () => {
   const { transactions, dispatch } = useContext(TransactionContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [editingTransaction, setEditingTransaction] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openMenuId && !event.target.closest('.menu-container')) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [openMenuId]);
+
   const handleDelete = (id) => {
     dispatch({ type: 'DELETE_TRANSACTION', payload: id });
+    setOpenMenuId(null);
   };
+
+  const handleEditClick = (transaction) => {
+    setEditingTransaction(transaction);
+    setOpenMenuId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleAddClick = () => {
+    setEditingTransaction(null);
+    setIsModalOpen(true);
+  }
+
+  const toggleMenu = (e, id) => {
+    e.stopPropagation();
+    if (openMenuId === id) {
+      setOpenMenuId(null);
+    } else {
+      setOpenMenuId(id);
+    }
+  };
+
   return (
     <div className="size">
       <div className="header">
         <h2 className="transaction font-size-list">تراکنش‌ها</h2>
-        <button className='button-transaction' onClick={() => setIsModalOpen(true)}>
+        <button className='button-transaction' onClick={handleAddClick}>
           <img src={PlusIcon} alt="icon" />
           <span className='font-size-list'>
             افزودن تراکنش
-
           </span>
         </button>
       </div>
@@ -62,14 +99,29 @@ const TransactionTable = () => {
                     </>
                   ) : null}
                 </div>
-
-
                 <div className="transaction-description">{tx.description}</div>
                 <div
-                  className="delete-btn left"
-                  onClick={() => handleDelete(tx.id)}
-                >
-                  <img src={Delete} alt="delete" />
+                  className="menu-container left">
+                  <div className='more-btn' onClick={(e) => toggleMenu(e, tx.id)}>
+                    <img src={More} alt="menu" />
+                  </div>
+
+                  {openMenuId === tx.id && (
+                    <div className="popup-menu">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleEditClick(tx); }}
+                        className="popup-menu-item edit-btn">
+                        <img src={Edit} alt="Edit" />
+                        <span>ویرایش</span>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDelete(tx.id); }}
+                        className="popup-menu-item">
+                        <img src={Delete} alt="Delete" />
+                        <span>حذف</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -78,7 +130,11 @@ const TransactionTable = () => {
       </div>
       {isModalOpen && (
         <AddTransactionForm
-          onClose={() => setIsModalOpen(false)}
+          initialData={editingTransaction}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingTransaction(null);
+          }}
         />
       )}
     </div>
