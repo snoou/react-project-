@@ -45,10 +45,25 @@ const TransactionTable = () => {
             <div className='info-parent' key={tx.id}>
               <div className="info" key={tx.id}>
                 <div className="transaction-date">{ToPersian(tx.date)}</div>
-                <div className={`${tx.type === 'expense' ? 'transaction-expense' : 'transaction-income'}`}>
-                  {`${ToPersian(tx.amount)}${tx.type === 'income' ? '+' : '-'}`}
-                  <span className='toman' >تومان</span>
+                <div className="transaction-income">
+                  {tx.type === 'income' ? (
+                    <>
+                      {`${ToPersian(tx.amount)}+`}
+                      <span className='toman'>تومان</span>
+                    </>
+                  ) : null}
                 </div>
+
+                <div className="transaction-expense">
+                  {tx.type === 'expense' ? (
+                    <>
+                      {`${ToPersian(tx.amount)}-`}
+                      <span className='toman'>تومان</span>
+                    </>
+                  ) : null}
+                </div>
+
+
                 <div className="transaction-description">{tx.description}</div>
                 <div
                   className="delete-btn left"

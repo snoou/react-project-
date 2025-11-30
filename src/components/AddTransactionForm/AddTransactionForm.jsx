@@ -52,9 +52,7 @@ const AddTransactionForm = ({ onClose }) => {
           {error && <p className="error">{error}</p>}
           <div className="row modal-add-div">
             <label>تاریخ</label>
-
             <DatePicker
-
               calendar={persian}
               locale={persian_fa}
               value={date}

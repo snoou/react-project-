@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 import './Diagram.css'
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+
+const SHAMSI_MONTHS = [
+  "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+  "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
+];
+
 const Diagram = ({ income = [], expense = [] }) => {
   const lineRef = useRef(null);
   const pieRef = useRef(null);
@@ -9,37 +18,73 @@ const Diagram = ({ income = [], expense = [] }) => {
   const pieChart = useRef(null);
   const barChart = useRef(null);
   const [year, setYear] = useState("");
-  const safeDate = (d) => (d ? new Date(d) : null);
+
+  const safeDate = (d) => {
+    if (!d) return null;
+    try {
+      const dateObject = new DateObject({
+        date: d,
+        calendar: persian,
+        locale: persian_fa,
+        format: "YYYY/MM/DD"
+      });
+      return dateObject;
+    } catch (e) {
+      console.error("Failed to parse date string into DateObject. Check if the date string is correctly formatted (YYYY/MM/DD) and not null:", d, e);
+      return null;
+    }
+  };
+
   const years = [...new Set(
     [...income, ...expense]
-      .map((i) => safeDate(i?.date)?.getFullYear())
+      .map((i) => safeDate(i?.date)?.year)
       .filter(Boolean)
   )].sort((a, b) => b - a);
-  const buildDailyData = () => {
+
+  const buildMonthlyData = () => {
     const y = Number(year);
-    const makeMap = (arr) => {
-      const m = new Map();
-      arr.forEach((i) => {
-        const dt = safeDate(i?.date);
-        if (!dt) return;
-        if (y && dt.getFullYear() !== y) return;
-        const key = dt.toISOString().slice(0, 10);
+    const incomeMonthlyData = Array(12).fill(0);
+    const expenseMonthlyData = Array(12).fill(0);
+
+    const aggregateData = (arr, targetArray) => {
+      arr.forEach((i, index) => {
+        const dtObject = safeDate(i?.date);
+
+        if (!dtObject) {
+          console.log(`Skipping transaction item at index ${index}. Date could not be parsed:`, i);
+          return;
+        }
+
+        if (y && dtObject.year !== y) return;
+
+        const monthIndex = dtObject.month - 1;
         const val = Number(i?.amount) || 0;
-        m.set(key, (m.get(key) || 0) + val);
+
+        if (monthIndex >= 0 && monthIndex < 12) {
+          targetArray[monthIndex] += val;
+        }
       });
-      return m;
     };
-    const incMap = makeMap(income);
-    const expMap = makeMap(expense);
-    const keys = [...new Set([...incMap.keys(), ...expMap.keys()])].sort(
-      (a, b) => new Date(a) - new Date(b)
-    );
-    return {
-      labels: keys,
-      incomeData: keys.map((k) => incMap.get(k) || 0),
-      expenseData: keys.map((k) => expMap.get(k) || 0),
+
+    aggregateData(income, incomeMonthlyData);
+    aggregateData(expense, expenseMonthlyData);
+
+    const result = {
+      labels: SHAMSI_MONTHS,
+      incomeData: incomeMonthlyData,
+      expenseData: expenseMonthlyData,
     };
+
+    console.log("Monthly Chart Data (Income/Expense/Year):", {
+      year: year || 'All',
+      incomeData: incomeMonthlyData,
+      expenseData: expenseMonthlyData
+    });
+
+    return result;
   };
+
+  const { labels, incomeData, expenseData } = buildMonthlyData();
   const buildTotals = () => {
     const sum = (arr) =>
       arr.reduce((t, i) => t + (Number(i?.amount) || 0), 0);
@@ -48,8 +93,10 @@ const Diagram = ({ income = [], expense = [] }) => {
       totalExpense: sum(expense),
     };
   };
-  const { labels, incomeData, expenseData } = buildDailyData();
   const { totalIncome, totalExpense } = buildTotals();
+
+  const currentYearTitle = year ? ` (سال ${year})` : ' (تمام سال‌ها)';
+
   useEffect(() => {
     if (lineChart.current) lineChart.current.destroy();
     if (!lineRef.current) return;
@@ -63,8 +110,20 @@ const Diagram = ({ income = [], expense = [] }) => {
           { label: "هزینه", data: expenseData, borderColor: "#f44336" },
         ],
       },
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            type: 'category',
+          }
+        }
+      }
     });
   }, [labels, incomeData, expenseData]);
+
   useEffect(() => {
     if (pieChart.current) pieChart.current.destroy();
     if (!pieRef.current) return;
@@ -79,8 +138,14 @@ const Diagram = ({ income = [], expense = [] }) => {
           },
         ],
       },
+      options: {
+        plugins: {
+          tooltip: { enabled: true }
+        }
+      }
     });
   }, [totalIncome, totalExpense]);
+
   useEffect(() => {
     if (barChart.current) barChart.current.destroy();
     if (!barRef.current) return;
@@ -95,9 +160,18 @@ const Diagram = ({ income = [], expense = [] }) => {
       },
       options: {
         responsive: true,
+        plugins: {
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            type: 'category',
+          }
+        }
       },
     });
   }, [labels, incomeData, expenseData]);
+
   return (
     <div style={{ width: 700, margin: "0px auto" }}>
       <div>
@@ -110,7 +184,7 @@ const Diagram = ({ income = [], expense = [] }) => {
         </select>
       </div>
 
-      <h3 className="chart-title">نمودار خطی</h3>
+      <h3 className="chart-title">نمودار خطی (روند ماهانه){currentYearTitle}</h3>
       <div className="chart-wrapper">
         <canvas ref={lineRef}></canvas>
       </div>
@@ -118,7 +192,7 @@ const Diagram = ({ income = [], expense = [] }) => {
       <div className="pie-box">
         <canvas ref={pieRef}></canvas>
       </div>
-      <h3 className="chart-title">نمودار میله‌ای روزانه</h3>
+      <h3 className="chart-title">نمودار میله‌ای (مقایسه ماهانه){currentYearTitle}</h3>
       <div className="chart-wrapper">
         <canvas ref={barRef}></canvas>
       </div>
