@@ -22,7 +22,6 @@ const TransactionTable = () => {
         setOpenMenuId(null);
       }
     };
-
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [openMenuId]);
@@ -31,18 +30,15 @@ const TransactionTable = () => {
     dispatch({ type: 'DELETE_TRANSACTION', payload: id });
     setOpenMenuId(null);
   };
-
   const handleEditClick = (transaction) => {
     setEditingTransaction(transaction);
     setOpenMenuId(null);
     setIsModalOpen(true);
   };
-
   const handleAddClick = () => {
     setEditingTransaction(null);
     setIsModalOpen(true);
   }
-
   const toggleMenu = (e, id) => {
     e.stopPropagation();
     if (openMenuId === id) {
@@ -51,7 +47,6 @@ const TransactionTable = () => {
       setOpenMenuId(id);
     }
   };
-
   return (
     <div className="size">
       <div className="header">
@@ -105,7 +100,6 @@ const TransactionTable = () => {
                   <div className='more-btn' onClick={(e) => toggleMenu(e, tx.id)}>
                     <img src={More} alt="menu" />
                   </div>
-
                   {openMenuId === tx.id && (
                     <div className="popup-menu">
                       <button
