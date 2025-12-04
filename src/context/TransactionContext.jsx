@@ -1,6 +1,7 @@
 import { createContext, useReducer, useEffect, useContext } from "react";
+import useFetch from "../hooks/useFetch"; 
 
-const API_URL = "http://localhost:3001/transactions";
+const API_URL = "http://localhost:3001/transactions"; 
 
 const INITIAL_STATE = {
     transactions: [],
@@ -28,7 +29,7 @@ const transactionReducer = (state, action) => {
             return { ...state, transactions: action.payload, isLoading: false, error: null };
 
         case ACTIONS.FETCH_ERROR:
-            return { ...state, isLoading: false, error: action.payload };
+            return { ...state, isLoading: false, error: action.payload }; 
 
         case ACTIONS.ADD_SUCCESS:
             return { ...state, transactions: [...state.transactions, action.payload] };
@@ -55,94 +56,80 @@ const transactionReducer = (state, action) => {
 export const TransactionProvider = ({ children }) => {
     const [state, dispatch] = useReducer(transactionReducer, INITIAL_STATE);
 
-    const fetchTransactions = async () => {
-        dispatch({ type: ACTIONS.FETCH_START });
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) {
-                throw new Error(`خطای ${response.status}: دریافت داده‌ها با مشکل مواجه شد.`);
-            }
-            const data = await response.json();
-            dispatch({ type: ACTIONS.FETCH_SUCCESS, payload: data });
-        } catch (err) {
-            dispatch({ type: ACTIONS.FETCH_ERROR, payload: err.message });
-        }
-    };
+    const { executeFetch } = useFetch(); 
 
     useEffect(() => {
-        fetchTransactions();
-    }, []);
-
-    const addTransaction = async (newTransaction) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newTransaction),
-            });
-            if (!response.ok) {
-                throw new Error("ثبت تراکنش جدید موفقیت‌آمیز نبود.");
+        const fetchData = async () => {
+            dispatch({ type: ACTIONS.FETCH_START });
+            
+            const result = await executeFetch(API_URL);
+            
+            if (result.success) {
+                dispatch({ type: ACTIONS.FETCH_SUCCESS, payload: result.data });
+            } else {
+                 dispatch({ type: ACTIONS.FETCH_ERROR, payload: result.error });
             }
-            const data = await response.json();
-            dispatch({ type: ACTIONS.ADD_SUCCESS, payload: data });
+        };
+
+        fetchData();
+        
+    }, [executeFetch]); 
+
+   
+    const addTransaction = async (newTransaction) => {
+        const options = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTransaction),
+        };
+        const result = await executeFetch(API_URL, options); 
+        
+        if (result.success) {
+            dispatch({ type: ACTIONS.ADD_SUCCESS, payload: result.data }); 
             return true;
-        } catch (err) {
-            console.error("خطای افزودن:", err.message);
-            dispatch({ type: ACTIONS.FETCH_ERROR, payload: `ثبت تراکنش شکست خورد: ${err.message}` });
-            return false;
         }
+        dispatch({ type: ACTIONS.FETCH_ERROR, payload: result.error });
+        return false;
     };
 
     const deleteTransaction = async (id) => {
-        try {
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: "DELETE",
-            });
-            if (!response.ok) {
-                throw new Error("حذف تراکنش موفقیت‌آمیز نبود.");
-            }
+        const endpoint = `${API_URL}/${id}`;
+        const options = { method: "DELETE" };
+        
+        const result = await executeFetch(endpoint, options); 
+        
+        if (result.success) {
             dispatch({ type: ACTIONS.DELETE_SUCCESS, payload: id });
-        } catch (err) {
-            console.error("خطای حذف:", err.message);
-            dispatch({ type: ACTIONS.FETCH_ERROR, payload: `حذف تراکنش شکست خورد: ${err.message}` });
+        } else {
+             dispatch({ type: ACTIONS.FETCH_ERROR, payload: result.error });
         }
     };
 
     const editTransaction = async (updatedTransaction) => {
-        try {
-            const response = await fetch(`${API_URL}/${updatedTransaction.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedTransaction),
-            });
+        const endpoint = `${API_URL}/${updatedTransaction.id}`;
+        const options = {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedTransaction),
+        };
 
-            if (!response.ok) {
-                throw new Error("ویرایش تراکنش موفقیت‌آمیز نبود.");
-            }
+        const result = await executeFetch(endpoint, options); 
 
-            let data = updatedTransaction;
-
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-                data = await response.json();
-            }
-
-            dispatch({ type: ACTIONS.EDIT_SUCCESS, payload: data });
-            return true;
-        } catch (err) {
-            console.error("خطای ویرایش:", err.message);
-            dispatch({ type: ACTIONS.FETCH_ERROR, payload: `ویرایش تراکنش شکست خورد: ${err.message}` });
-            return false;
+        if (result.success) {
+            dispatch({ type: ACTIONS.EDIT_SUCCESS, payload: result.data }); 
+            return true; 
         }
+        dispatch({ type: ACTIONS.FETCH_ERROR, payload: result.error });
+        return false;
     };
+    
     const contextValue = {
         transactions: state.transactions,
-        isLoading: state.isLoading,
-        error: state.error,
+        isLoading: state.isLoading, 
+        error: state.error, 
         addTransaction,
         deleteTransaction,
         editTransaction,
-        fetchTransactions,
     };
 
     return (
@@ -151,6 +138,7 @@ export const TransactionProvider = ({ children }) => {
         </TransactionContext.Provider>
     );
 };
+
 export const useTransactionContext = () => {
     const context = useContext(TransactionContext);
     if (!context) {
@@ -158,12 +146,13 @@ export const useTransactionContext = () => {
     }
     return context;
 }
+
 const UseContext = () => {
     const context = useTransactionContext();
     const income = context.transactions.filter(tx => tx.type === "income");
     const expense = context.transactions.filter(tx => tx.type === "expense");
     const list = [income, expense];
-    return { list, isLoading: context.isLoading, error: context.error };
+    return { list, isLoading: context.isLoading, error: context.error }; 
 }
 
 export default UseContext;
