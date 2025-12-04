@@ -1,0 +1,18 @@
+{
+  "transactions": [
+    {
+      "date": "۱۴۰۴/۰۹/۰۲",
+      "amount": -554444,
+      "type": "expense",
+      "description": "زیبا",
+      "id": "03b3"
+    },
+    {
+      "id": "782c",
+      "date": "۱۴۰۴/۰۹/۱۲",
+      "amount": 557544,
+      "type": "income",
+      "description": "سلاممم"
+    }
+  ]
+}

@@ -1,67 +1,85 @@
 import { useContext, useState, useEffect } from "react";
 import './AddTransactionForm.css';
-import Id from '../../utils/Id';
 import VectorIcon from '../../assets/icon/Vector.png';
 import Line from '../../assets/icon/Line1.png'
-import { TransactionContext } from "../../context/TransactionContext";
+import { TransactionContext, useTransactionContext } from "../../context/TransactionContext";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 
 const AddTransactionForm = ({ onClose, initialData }) => {
-  const { dispatch } = useContext(TransactionContext);
+  const { addTransaction, editTransaction } = useTransactionContext();
+
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('income');
   const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (initialData) {
+      const displayAmount = initialData.type === 'expense'
+        ? Math.abs(initialData.amount)
+        : initialData.amount;
+
       setDate(initialData.date);
-      setAmount(initialData.amount);
+      setAmount(String(displayAmount));
       setType(initialData.type);
       setDescription(initialData.description);
     }
   }, [initialData]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!date || !amount || !description) {
-      setError('لطفاً تمام فیلدها را پر کنید');
+      setError('لطفاً تمام فیلدها را پر کنید.');
       return;
     }
-    setError('');
 
-    if (initialData) {
-      dispatch({
-        type: "EDIT_TRANSACTION",
-        payload: {
-          id: initialData.id,
-          date: date.toString(),
-          amount: parseFloat(amount),
-          type,
-          description,
-        },
-      });
-    } else {
-      dispatch({
-        type: "ADD_TRANSACTION",
-        payload: {
-          id: Id(),
-          date: date.toString(),
-          amount: parseFloat(amount),
-          type,
-          description,
-        },
-      });
+
+    const normalizedAmount = parseFloat(amount);
+    if (normalizedAmount <= 0) {
+      setError('مبلغ باید بزرگتر از صفر باشد.');
+      return;
     }
 
-    setDate('');
-    setAmount('');
-    setType('income');
-    setDescription('');
-    if (onClose) onClose();
+    setError('');
+    setIsSubmitting(true);
+
+    let success = false;
+
+    const transactionData = {
+      date: date.toString(),
+      amount: type === 'expense' ? -normalizedAmount : normalizedAmount,
+      type,
+      description,
+    };
+
+    try {
+      if (initialData) {
+        const updatedData = { ...transactionData, id: initialData.id };
+        success = await editTransaction(updatedData);
+      } else {
+        success = await addTransaction(transactionData);
+      }
+
+      if (success) {
+        setDate('');
+        setAmount('');
+        setType('income');
+        setDescription('');
+        if (onClose) onClose();
+      } else {
+        setError(initialData ? 'خطا در ویرایش تراکنش. لطفاً دوباره تلاش کنید.' : 'خطا در ثبت تراکنش. لطفاً دوباره تلاش کنید.');
+      }
+
+    } catch (apiError) {
+      console.error("خطای API:", apiError);
+      setError('خطای ارتباط با سرور. لطفاً اتصال خود را بررسی کنید.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -75,7 +93,9 @@ const AddTransactionForm = ({ onClose, initialData }) => {
           <img className="on-resposive" src={Line} alt="line" />
         </div>
         <form onSubmit={handleSubmit}>
-          {error && <p className="error">{error}</p>}
+          {(error || useTransactionContext().error) &&
+            <p className="error">{error || useTransactionContext().error}</p>
+          }
           <div className="row modal-add-div">
             <label>تاریخ</label>
             <DatePicker
@@ -94,7 +114,7 @@ const AddTransactionForm = ({ onClose, initialData }) => {
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(e.target.value.replace('-', ''))}
             />
           </div>
           <div className="modal-add-div">
@@ -131,10 +151,14 @@ const AddTransactionForm = ({ onClose, initialData }) => {
             />
           </div>
           <div className="buttons modal-add-div ">
-            <button type="button" onClick={onClose}>
+            <button type="button" onClick={onClose} disabled={isSubmitting}>
               انصراف
             </button>
-            <button type="submit">{initialData ? 'ویرایش' : 'ثبت'}</button>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting
+                ? 'در حال ارسال...'
+                : initialData ? 'ویرایش' : 'ثبت'}
+            </button>
           </div>
         </form>
       </div>
