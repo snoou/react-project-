@@ -32,6 +32,11 @@
   text-align: right;
 }
 
+.colse-add{
+  background: none;
+  margin: 0;
+  padding: 0;
+}
 
 .head {
   display: flex;

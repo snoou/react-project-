@@ -1,25 +1,18 @@
 {
   "transactions": [
     {
-      "date": "۱۴۰۴/۰۹/۱۲",
-      "amount": -557544,
-      "type": "expense",
-      "description": "سلاممم",
-      "id": "782c"
-    },
-    {
-      "id": "6a89",
       "date": "۱۴۰۴/۰۹/۱۳",
-      "amount": 544455,
-      "type": "income",
-      "description": "بیبب"
+      "amount": -544454,
+      "type": "expense",
+      "description": "بیبب",
+      "id": "6a89"
     },
     {
-      "id": "f090",
-      "date": "۱۴۰۴/۰۹/۱۸",
-      "amount": 3455,
+      "id": "7029",
+      "date": "۱۴۰۴/۰۹/۱۳",
+      "amount": 37,
       "type": "income",
-      "description": "ییییییییییی"
+      "description": "gdfg"
     }
   ]
 }
