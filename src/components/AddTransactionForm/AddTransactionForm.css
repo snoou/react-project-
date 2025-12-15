@@ -32,7 +32,7 @@
   text-align: right;
 }
 
-.colse-add{
+.colse-add {
   background: none;
   margin: 0;
   padding: 0;
@@ -47,7 +47,6 @@
 .head img {
   cursor: pointer;
 }
-
 
 form {
   display: flex;
