@@ -1,11 +1,11 @@
 import './Dashboard.css'
 import Diagram from '../Diagram/Diagram';
-import UseContext from '../../context/TransactionContext';
+import UseTransactions from '../../context/TransactionContext';
 
 const Dashboard = () => {
-  const { list, isLoading, error } = UseContext();
-  const [income, expense] = list;
-
+  const { list, isLoading, error } = UseTransactions();
+  const listData = list || [0 , 0]
+  const [income, expense] = listData;
   if (isLoading) {
     return (
       <div className="size">

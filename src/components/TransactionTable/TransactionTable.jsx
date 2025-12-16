@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import './TransactionTable.css';
 import AddTransactionForm from '../AddTransactionForm/AddTransactionForm';
 import DangerIcon from '../../assets/icon/DangerCircle.png';
+import Vector from '../../assets/icon/Vector.png';  
 import Delete from '../../assets/icon/Delete.png'
 import PlusIcon from '../../assets/icon/Plus.png';
 import Edit from '../../assets/icon/Edit.png'
@@ -15,12 +16,14 @@ const TransactionTable = () => {
     isLoading, 
     error, 
     deleteTransaction, 
-  
   } = useTransactionContext(); 
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [editingTransaction, setEditingTransaction] = useState(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,11 +35,25 @@ const TransactionTable = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [openMenuId]);
 
-  const handleDelete = async (id) => {
-    await deleteTransaction(id); 
+  const handleDeleteClick = (id) => {
+    setIdToDelete(id);
+    setIsDeleteModalOpen(true);
     setOpenMenuId(null);
   };
   
+  const confirmDelete = async () => {
+    if (idToDelete) {
+      await deleteTransaction(idToDelete); 
+      setIsDeleteModalOpen(false);
+      setIdToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setIdToDelete(null);
+  };
+
   const handleEditClick = (transaction) => {
     setEditingTransaction(transaction);
     setOpenMenuId(null);
@@ -58,7 +75,6 @@ const TransactionTable = () => {
   };
 
   let content;
-
   if (isLoading) {
     content = (
       <div className="not loading-state">
@@ -117,7 +133,7 @@ const TransactionTable = () => {
                   <span>ویرایش</span>
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(tx.id); }}
+                  onClick={(e) => { e.stopPropagation(); handleDeleteClick(tx.id); }}
                   className="popup-menu-item">
                   <img src={Delete} alt="Delete" />
                   <span>حذف</span>
@@ -152,6 +168,7 @@ const TransactionTable = () => {
       <div className="table-body">
         {content} 
       </div>
+      
       {isModalOpen && (
         <AddTransactionForm
           initialData={editingTransaction}
@@ -160,6 +177,24 @@ const TransactionTable = () => {
             setEditingTransaction(null);
           }}
         />
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="delete-modal-overlay">
+          <div className="delete-modal-content">
+            <div className="delete-modal-header">
+              <h3>حذف تراکنش</h3>
+              <span className="close-icon" onClick={cancelDelete}><img src={Vector} alt=""/></span>
+            </div>
+            <div className="delete-modal-body">
+              <p>از حذف تراکنش اطمینان دارید؟</p>
+            </div>
+            <div className="delete-modal-footer">
+              <button className="btn-cancel" onClick={cancelDelete}>انصراف</button>
+              <button className="btn-confirm-delete" onClick={confirmDelete}>حذف</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -9,12 +9,10 @@ import persian_fa from "react-date-object/locales/persian_fa";
 
 const AddTransactionForm = ({ onClose, initialData }) => {
   const { addTransaction, editTransaction } = useTransactionContext();
-
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('income');
   const [description, setDescription] = useState('');
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -88,7 +86,7 @@ const AddTransactionForm = ({ onClose, initialData }) => {
           <h3 className="off-resposive">
             {initialData ? 'ویرایش تراکنش' : 'افزودن تراکنش'}
           </h3>
-          <button className="colse-add"  onClick={onClose}>
+          <button className="colse-add" onClick={onClose}>
             <img className="off-resposive" src={VectorIcon} alt="کنسل" />
           </button>
           <img className="on-resposive" src={Line} alt="line" />
