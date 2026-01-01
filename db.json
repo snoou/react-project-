@@ -1,25 +1,3 @@
 {
-  "transactions": [
-    {
-      "id": "77de",
-      "date": "۱۴۰۴/۰۹/۱۲",
-      "amount": 27,
-      "type": "income",
-      "description": "ddddfdfdf"
-    },
-    {
-      "id": "64c1",
-      "date": "۱۴۰۴/۰۹/۱۹",
-      "amount": -32,
-      "type": "expense",
-      "description": "fdfdsff"
-    },
-    {
-      "id": "d017",
-      "date": "۱۴۰۴/۰۹/۲۰",
-      "amount": 51,
-      "type": "income",
-      "description": "fffffffffffffsd"
-    }
-  ]
+  "transactions": []
 }

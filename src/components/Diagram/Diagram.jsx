@@ -42,7 +42,7 @@ const Diagram = ({ income = [], expense = [] }) => {
   )].sort((a, b) => b - a);
 
   const buildMonthlyData = () => {
-    const y = Number(year);
+    const y = Number(year); ///??????????????????
     const incomeMonthlyData = Array(12).fill(0);
     const expenseMonthlyData = Array(12).fill(0);
 
@@ -70,7 +70,7 @@ const Diagram = ({ income = [], expense = [] }) => {
       incomeData: incomeMonthlyData,
       expenseData: expenseMonthlyData,
     };
-
+///////////////////////
     console.log("Monthly Chart Data (Income/Expense/Year):", {
       year: year || 'All',
       incomeData: incomeMonthlyData,

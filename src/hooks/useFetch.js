@@ -16,8 +16,8 @@ const useFetch = () => {
             } else if (options.method === 'PUT' || options.method === 'PATCH') {
                 try {
                     resultData = JSON.parse(options.body);
-                } catch (e) {
-                    resultData = JSON.parse(options.body); 
+                } catch (e) {   
+                                    //  resultData = JSON.parse(options.body); 
                 }
             }
             
