@@ -88,6 +88,34 @@ const TransactionTable = () => {
   const goToNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   const goToPrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
+  const paginationRange = useMemo(() => {
+    const totalNumbers = 5; 
+    const totalBlocks = totalNumbers + 2; 
+
+    if (totalPages <= totalBlocks) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    let pages = [1];
+
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+
+    if (currentPage <= 3) {
+      pages = [1, 2, 3, 4, 5, '...', totalPages];
+    } else if (currentPage >= totalPages - 2) {
+      pages = [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    } else {
+      pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+    }
+
+    return pages;
+  }, [currentPage, totalPages]);
+
   const handleAddClick = () => {
     setEditingTransaction(null);
     setIsModalOpen(true);
@@ -220,7 +248,7 @@ const TransactionTable = () => {
       <div className="filters-container">
         <div className="filter-group">
           <label>از تاریخ</label>
-          <div className="">
+          <div className="input-with-icon">
             <DatePicker
               value={startDate}
               onChange={setStartDate}
@@ -234,7 +262,7 @@ const TransactionTable = () => {
 
         <div className="filter-group">
           <label>تا تاریخ</label>
-          <div className="">
+          <div className="input-with-icon">
             <DatePicker
               value={endDate}
               onChange={setEndDate}
@@ -280,15 +308,21 @@ const TransactionTable = () => {
             &lt;
           </button>
 
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => paginate(index + 1)}
-              className={`pagination-number ${currentPage === index + 1 ? 'active' : ''}`}
-            >
-              {ToPersian(index + 1)}
-            </button>
-          ))}
+          {paginationRange.map((page, index) => {
+            if (page === '...') {
+              return <span key={`dots-${index}`} className="pagination-dots">...</span>;
+            }
+
+            return (
+              <button
+                key={page}
+                onClick={() => paginate(page)}
+                className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+              >
+                {ToPersian(page)}
+              </button>
+            );
+          })}
 
           <button
             className="pagination-arrow"

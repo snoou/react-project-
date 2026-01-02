@@ -1,9 +1,37 @@
-import { useEffect, useRef, useState } from "react";
-import Chart from "chart.js/auto";
-import './Diagram.css'
+import React, { useState, useMemo, memo } from "react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  Filler,
+} from "chart.js";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
 import DateObject from "react-date-object";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+
+// ایمپورت فایل CSS
+import "./Diagram.css"; 
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  Filler
+);
 
 const SHAMSI_MONTHS = [
   "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
@@ -11,190 +39,158 @@ const SHAMSI_MONTHS = [
 ];
 
 const Diagram = ({ income = [], expense = [] }) => {
-  const lineRef = useRef(null);
-  const pieRef = useRef(null);
-  const barRef = useRef(null);
-  const lineChart = useRef(null);
-  const pieChart = useRef(null);
-  const barChart = useRef(null);
   const [year, setYear] = useState("");
 
-  const safeDate = (d) => {
-    if (!d) return null;
-    try {
-      const dateObject = new DateObject({
-        date: d,
-        calendar: persian,
-        locale: persian_fa,
-        format: "YYYY/MM/DD"
+  const incomeStr = JSON.stringify(income);
+  const expenseStr = JSON.stringify(expense);
+
+  const { processedData, years, totals } = useMemo(() => {
+    const inc = JSON.parse(incomeStr || "[]");
+    const exp = JSON.parse(expenseStr || "[]");
+
+    const incomeMonthly = Array(12).fill(0);
+    const expenseMonthly = Array(12).fill(0);
+    let totalInc = 0;
+    let totalExp = 0;
+    const distinctYears = new Set();
+
+    const processItems = (items, targetArray, isIncome) => {
+      if (!Array.isArray(items)) return;
+
+      items.forEach((item) => {
+        if (!item?.date) return;
+        try {
+          const dateObj = new DateObject({
+            date: item.date,
+            calendar: persian,
+            locale: persian_fa,
+            format: "YYYY/MM/DD",
+          });
+
+          distinctYears.add(dateObj.year);
+
+          if (year && dateObj.year !== Number(year)) return;
+
+          const amount = Number(item.amount) || 0;
+          const monthIndex = dateObj.month - 1;
+
+          if (monthIndex >= 0 && monthIndex < 12) {
+            targetArray[monthIndex] += amount;
+            if (isIncome) totalInc += amount;
+            else totalExp += amount;
+          }
+        } catch (e) {}
       });
-      return dateObject;
-    } catch (e) {
-      console.error("Failed to parse date string into DateObject. Check if the date string is correctly formatted (YYYY/MM/DD) and not null:", d, e);
-      return null;
+    };
+
+    processItems(inc, incomeMonthly, true);
+    processItems(exp, expenseMonthly, false);
+
+    return {
+      processedData: { income: incomeMonthly, expense: expenseMonthly },
+      years: [...distinctYears].sort((a, b) => b - a),
+      totals: { income: totalInc, expense: totalExp, balance: totalInc - totalExp }
+    };
+  }, [incomeStr, expenseStr, year]);
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { family: "Vazirmatn" } } },
+      tooltip: { titleFont: { family: "Vazirmatn" }, bodyFont: { family: "Vazirmatn" } }
+    },
+    scales: {
+      x: { ticks: { font: { family: "Vazirmatn" } } },
+      y: { ticks: { font: { family: "Vazirmatn" } } }
     }
   };
 
-  const years = [...new Set(
-    [...income, ...expense]
-      .map((i) => safeDate(i?.date)?.year)
-      .filter(Boolean)
-  )].sort((a, b) => b - a);
-
-  const buildMonthlyData = () => {
-    const y = Number(year); ///??????????????????
-    const incomeMonthlyData = Array(12).fill(0);
-    const expenseMonthlyData = Array(12).fill(0);
-
-    const aggregateData = (arr, targetArray) => {
-      arr.forEach((i, index) => {
-        const dtObject = safeDate(i?.date);
-        if (!dtObject) {
-          console.log(`Skipping transaction item at index ${index}. Date could not be parsed:`, i);
-          return;
-        }
-        if (y && dtObject.year !== y) return;
-        const monthIndex = dtObject.month - 1;
-        const val = Number(i?.amount) || 0;
-        if (monthIndex >= 0 && monthIndex < 12) {
-          targetArray[monthIndex] += val;
-        }
-      });
-    };
-
-    aggregateData(income, incomeMonthlyData);
-    aggregateData(expense, expenseMonthlyData);
-
-    const result = {
-      labels: SHAMSI_MONTHS,
-      incomeData: incomeMonthlyData,
-      expenseData: expenseMonthlyData,
-    };
-///////////////////////
-    console.log("Monthly Chart Data (Income/Expense/Year):", {
-      year: year || 'All',
-      incomeData: incomeMonthlyData,
-      expenseData: expenseMonthlyData
-    });
-
-    return result;
+  const doughnutOptions = {
+    ...options,
+    scales: { x: { display: false }, y: { display: false } },
+    plugins: { ...options.plugins, legend: { position: 'bottom' } }
   };
 
-  const { labels, incomeData, expenseData } = buildMonthlyData();
-  const buildTotals = () => {
-    const sum = (arr) =>
-      arr.reduce((t, i) => t + (Number(i?.amount) || 0), 0);
-    return {
-      totalIncome: sum(income),
-      totalExpense: sum(expense),
-    };
-  };
-  const { totalIncome, totalExpense } = buildTotals();
-
-  const currentYearTitle = year ? ` (سال ${year})` : ' (تمام سال‌ها)';
-
-  useEffect(() => {
-    if (lineChart.current) lineChart.current.destroy();
-    if (!lineRef.current) return;
-
-    lineChart.current = new Chart(lineRef.current, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          { label: "درآمد", data: incomeData, borderColor: "#4caf50" },
-          { label: "هزینه", data: expenseData, borderColor: "#f44336" },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          tooltip: { enabled: true }
-        },
-        scales: {
-          x: {
-            type: 'category',
-          }
-        }
-      }
-    });
-  }, [labels, incomeData, expenseData]);
-
-  useEffect(() => {
-    if (pieChart.current) pieChart.current.destroy();
-    if (!pieRef.current) return;
-    pieChart.current = new Chart(pieRef.current, {
-      type: "pie",
-      data: {
-        labels: ["درآمد کل", "هزینه کل"],
-        datasets: [
-          {
-            data: [totalIncome, totalExpense],
-            backgroundColor: ["#4caf50", "#f44336"],
-          },
-        ],
-      },
-      options: {
-        plugins: {
-          tooltip: { enabled: true }
-        }
-      }
-    });
-  }, [totalIncome, totalExpense]);
-
-  useEffect(() => {
-    if (barChart.current) barChart.current.destroy();
-    if (!barRef.current) return;
-    barChart.current = new Chart(barRef.current, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          { label: "درآمد", data: incomeData, backgroundColor: "#4caf50" },
-          { label: "هزینه", data: expenseData, backgroundColor: "#f44336" },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          tooltip: { enabled: true }
-        },
-        scales: {
-          x: {
-            type: 'category',
-          }
-        }
-      },
-    });
-  }, [labels, incomeData, expenseData]);
+  const formatNumber = (num) => new Intl.NumberFormat('fa-IR').format(num);
 
   return (
-    <div style={{ width: 700, margin: "0px auto" }}>
-      <div>
-        <label>سال:</label>
-        <select className="input" value={year} onChange={(e) => setYear(e.target.value)}>
-          <option value="">تمام سال‌ها</option>
+    <div className="diagram-container">
+      <div className="diagram-header">
+        <h2 className="header-title">داشبورد مالی</h2>
+        <select
+          className="year-select"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+        >
+          <option value="">همه سال‌ها</option>
           {years.map((y) => (
             <option key={y} value={y}>{y}</option>
           ))}
         </select>
       </div>
 
-      <h3 className="chart-title">نمودار خطی (روند ماهانه){currentYearTitle}</h3>
-      <div className="chart-wrapper">
-        <canvas ref={lineRef}></canvas>
-      </div>
-      <h3 className="chart-title">نمودار دایره‌ای (مجموع کل)</h3>
-      <div className="pie-box">
-        <canvas ref={pieRef}></canvas>
-      </div>
-      <h3 className="chart-title">نمودار میله‌ای (مقایسه ماهانه){currentYearTitle}</h3>
-      <div className="chart-wrapper">
-        <canvas ref={barRef}></canvas>
+      <div className="cards-container">
+        <div className="card">
+          <div className="card-title">درآمد کل</div>
+          <p className="card-value text-green">{formatNumber(totals.income)} ت</p>
+        </div>
+        <div className="card">
+          <div className="card-title">هزینه کل</div>
+          <p className="card-value text-red">{formatNumber(totals.expense)} ت</p>
+        </div>
+        <div className="card">
+          <div className="card-title">تراز</div>
+          <p className={`card-value ltr-dir ${totals.balance >= 0 ? 'text-blue' : 'text-yellow'}`}>
+            {formatNumber(totals.balance)} ت
+          </p>
+        </div>
       </div>
 
+      <div className="charts-grid">
+        {/* اضافه کردن کلاس full-width برای اینکه کل عرض را بگیرد */}
+        <div className="chart-box full-width">
+          <h4 className="chart-title">روند ماهانه</h4>
+          <div className="canvas-wrapper">
+            <Line options={options} data={{
+              labels: SHAMSI_MONTHS,
+              datasets: [
+                { label: "درآمد", data: processedData.income, borderColor: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.2)", tension: 0.3, fill: true },
+                { label: "هزینه", data: processedData.expense, borderColor: "#ef4444", backgroundColor: "rgba(239, 68, 68, 0.2)", tension: 0.3, fill: true },
+              ]
+            }} />
+          </div>
+        </div>
+
+        <div className="chart-box">
+          <h4 className="chart-title">مقایسه</h4>
+          <div className="canvas-wrapper">
+            <Bar options={options} data={{
+              labels: SHAMSI_MONTHS,
+              datasets: [
+                { label: "درآمد", data: processedData.income, backgroundColor: "#10b981", borderRadius: 4 },
+                { label: "هزینه", data: processedData.expense, backgroundColor: "#ef4444", borderRadius: 4 },
+              ]
+            }} />
+          </div>
+        </div>
+
+        <div className="chart-box">
+          <h4 className="chart-title">نسبت کل</h4>
+          <div className="canvas-wrapper">
+            <Doughnut options={doughnutOptions} data={{
+              labels: ["درآمد", "هزینه"],
+              datasets: [{
+                data: [totals.income, totals.expense],
+                backgroundColor: ["#10b981", "#ef4444"],
+                borderWidth: 0,
+              }]
+            }} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Diagram;
+export default memo(Diagram);

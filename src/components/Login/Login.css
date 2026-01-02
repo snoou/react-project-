@@ -3,7 +3,6 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #E5E5E5; /* رنگ پس‌زمینه کلی */
     font-family: "Vazirmatn", sans-serif;
 }
 
@@ -12,7 +11,7 @@
     padding: 40px;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    width: 100%;
+    width: 400px;
     max-width: 350px;
     text-align: center;
 }
@@ -80,3 +79,4 @@
 .login-btn:hover {
     background-color: #0a25b5;
 }
+

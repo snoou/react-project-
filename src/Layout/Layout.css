@@ -9,7 +9,7 @@
 .head-layout {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: space-between;
   width: 100vw;
   height: 64px;
   background-color: #fff;
@@ -47,8 +47,19 @@
   color: white;
 }
 
+.exit {
+  background: none;
+
+
+}
+
+.left-head-layout {
+  display: flex;
+  gap: 10px;
+}
+
 @media (max-width: 768px) {
   .head-layout {
-    justify-content: space-between;
+    width: 100%;
   }
 }

@@ -1,5 +1,6 @@
 import { createContext, useReducer, useEffect, useContext } from "react";
 import useFetch from "../hooks/useFetch";
+import { useAuth } from "./AuthContext"; 
 
 const API_URL = "http://localhost:3001/transactions";
 
@@ -49,14 +50,18 @@ const transactionReducer = (state, action) => {
 
 export const TransactionProvider = ({ children }) => {
     const [state, dispatch] = useReducer(transactionReducer, INITIAL_STATE);
-
     const { executeFetch } = useFetch();
+    
+    const { user } = useAuth(); 
 
     useEffect(() => {
         const fetchData = async () => {
-            dispatch({ type: ACTIONS.FETCH_START });
+            if (!user) return;
 
-            const result = await executeFetch(API_URL);
+            dispatch({ type: ACTIONS.FETCH_START });
+            
+            const userSpecificUrl = `${API_URL}?userId=${user.id}`;
+            const result = await executeFetch(userSpecificUrl);
 
             if (result.success) {
                 dispatch({ type: ACTIONS.FETCH_SUCCESS, payload: result.data });
@@ -67,14 +72,17 @@ export const TransactionProvider = ({ children }) => {
 
         fetchData();
 
-    }, [executeFetch]);
-
+    }, [executeFetch, user]);
 
     const addTransaction = async (newTransaction) => {
+        if (!user) return false;
+
+        const transactionWithUser = { ...newTransaction, userId: user.id };
+
         const options = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newTransaction),
+            body: JSON.stringify(transactionWithUser),
         };
         const result = await executeFetch(API_URL, options);
 
@@ -100,11 +108,14 @@ export const TransactionProvider = ({ children }) => {
     };
 
     const editTransaction = async (updatedTransaction) => {
+        // مطمئن می‌شویم که userId حفظ می‌شود
+        const transactionWithUser = { ...updatedTransaction, userId: user.id };
+        
         const endpoint = `${API_URL}/${updatedTransaction.id}`;
         const options = {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedTransaction),
+            body: JSON.stringify(transactionWithUser),
         };
 
         const result = await executeFetch(endpoint, options);
@@ -143,8 +154,9 @@ export const useTransactionContext = () => {
 
 const UseTransactions = () => {
     const context = useTransactionContext();
-    const income = context.transactions.filter(tx => tx.type === "income");
-    const expense = context.transactions.filter(tx => tx.type === "expense");
+    const txList = context.transactions || [];
+    const income = txList.filter(tx => tx.type === "income");
+    const expense = txList.filter(tx => tx.type === "expense");
     const list = [income, expense];
     return { list, isLoading: context.isLoading, error: context.error };
 }

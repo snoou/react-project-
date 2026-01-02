@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import Logo from "../../assets/icon/monlogo.png"; 
+import Logo from "../../assets/icon/monlogo.png";
 import "./Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -17,13 +18,19 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); 
+
     if (email && password) {
-      login(email, password);
-      navigate("/dashboard", { replace: true });
+      const result = await login(email, password);
+      if (result.success) {
+        navigate("/dashboard", { replace: true });
+      } else {
+        setError(result.message);
+      }
     } else {
-      alert("لطفا ایمیل و رمز عبور را وارد کنید");
+      setError("لطفا ایمیل و رمز عبور را وارد کنید");
     }
   };
 
@@ -36,6 +43,9 @@ const Login = () => {
         </div>
         
         <form onSubmit={handleSubmit}>
+          {/* نمایش پیام خطا */}
+          {error && <p style={{color: 'red', fontSize: '14px', marginBottom: '10px'}}>{error}</p>}
+
           <div className="form-group">
             <label>ایمیل</label>
             <input
@@ -43,6 +53,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="login-input"
+              placeholder="مثال: admin@gmail.com"
             />
           </div>
 
@@ -53,6 +64,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="login-input"
+              placeholder="مثال: 123"
             />
           </div>
 
