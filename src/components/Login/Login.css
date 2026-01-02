@@ -1,0 +1,82 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #E5E5E5; /* رنگ پس‌زمینه کلی */
+    font-family: "Vazirmatn", sans-serif;
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.login-logo {
+    width: 60px;
+    height: auto;
+}
+
+.login-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+    font-size: 14px;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #FAFAFB;
+}
+
+.login-input:focus {
+    border-color: #0E33F3;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #0E33F3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    background-color: #0a25b5;
+}
