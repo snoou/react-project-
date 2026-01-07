@@ -60,7 +60,7 @@ form {
   gap: 10px;
 }
 
-label {
+.lable-add {
   font-size: 14px;
   color: #333;
   text-align: right;

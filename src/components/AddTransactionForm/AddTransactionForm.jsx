@@ -98,7 +98,7 @@ const AddTransactionForm = ({ onClose, initialData }) => {
             <p className="error">{error || useTransactionContext().error}</p>
           }
           <div className="row modal-add-div">
-            <label>تاریخ</label>
+            <label className="lable-add">تاریخ</label>
             <DatePicker
               calendar={persian}
               locale={persian_fa}
@@ -111,7 +111,7 @@ const AddTransactionForm = ({ onClose, initialData }) => {
             />
           </div>
           <div className="row modal-add-div ">
-            <label>مبلغ (تومان)</label>
+            <label className="lable-add">مبلغ (تومان)</label>
             <input
               type="number"
               value={amount}
@@ -119,10 +119,10 @@ const AddTransactionForm = ({ onClose, initialData }) => {
             />
           </div>
           <div className="modal-add-div">
-            <label>نوع تراکنش</label>
+            <label className="lable-add">نوع تراکنش</label>
             <div className="type-t modal-add-div ">
               {/* ?????????????????????????????????????????? */}
-              <label>
+              <label className="lable-add">
                 <input
                   type="radio"
                   name="type"
@@ -132,7 +132,7 @@ const AddTransactionForm = ({ onClose, initialData }) => {
                 />
                 درآمد
               </label>
-              <label>
+              <label className="lable-add">
                 <input
                   type="radio"
                   name="type"
@@ -145,7 +145,7 @@ const AddTransactionForm = ({ onClose, initialData }) => {
             </div>
           </div>
           <div className="row modal-add-div">
-            <label>شرح</label>
+            <label className="lable-add">شرح</label>
             <input
               type="text"
               value={description}

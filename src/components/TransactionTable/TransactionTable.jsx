@@ -8,6 +8,7 @@ import Delete from '../../assets/icon/Delete.png';
 import PlusIcon from '../../assets/icon/Plus.png';
 import Edit from '../../assets/icon/Edit.png';
 import More from '../../assets/icon/More.png';
+import CalendarIcon from '../../assets/icon/Calendar.png';
 
 import ToPersian from '../../utils/ToPersian';
 
@@ -89,8 +90,8 @@ const TransactionTable = () => {
   const goToPrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   const paginationRange = useMemo(() => {
-    const totalNumbers = 5; 
-    const totalBlocks = totalNumbers + 2; 
+    const totalNumbers = 5;
+    const totalBlocks = totalNumbers + 2;
 
     if (totalPages <= totalBlocks) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -180,7 +181,7 @@ const TransactionTable = () => {
           <div className="transaction-income">
             {tx.type === 'income' && (
               <>
-                {ToPersian(tx.amount)}+
+                {ToPersian(Number(tx.amount).toLocaleString())}+
                 <span className="toman"> تومان</span>
               </>
             )}
@@ -189,7 +190,7 @@ const TransactionTable = () => {
           <div className="transaction-expense">
             {tx.type === 'expense' && (
               <>
-                {ToPersian(Math.abs(tx.amount))}-
+                {ToPersian(Number(tx.amount).toLocaleString())}-
                 <span className="toman"> تومان</span>
               </>
             )}
@@ -245,53 +246,57 @@ const TransactionTable = () => {
         </button>
       </div>
 
-      <div className="filters-container">
-        <div className="filter-group">
-          <label>از تاریخ</label>
-          <div className="input-with-icon">
-            <DatePicker
-              value={startDate}
-              onChange={setStartDate}
-              calendar={persian}
-              locale={persian_fa}
-              format="YYYY/MM/DD"
-              placeholder="انتخاب تاریخ"
-            />
-          </div>
-        </div>
+     <div className="filters-container">
+  <div className="filter-group">
+    <label>از تاریخ</label>
+    <div className="input-with-icon">
+      <DatePicker
+        value={startDate}
+        onChange={setStartDate}
+        calendar={persian}
+        locale={persian_fa}
+        format="YYYY/MM/DD"
+        placeholder="انتخاب تاریخ"
+        containerClassName="w-100" 
+        inputClass="custom-date-input" 
+      />
+    </div>
+  </div>
 
-        <div className="filter-group">
-          <label>تا تاریخ</label>
-          <div className="input-with-icon">
-            <DatePicker
-              value={endDate}
-              onChange={setEndDate}
-              calendar={persian}
-              locale={persian_fa}
-              format="YYYY/MM/DD"
-              placeholder="انتخاب تاریخ"
-            />
-          </div>
-        </div>
+  <div className="filter-group">
+    <label>تا تاریخ</label>
+    <div className="input-with-icon">
+      <DatePicker
+        value={endDate}
+        onChange={setEndDate}
+        calendar={persian}
+        locale={persian_fa}
+        format="YYYY/MM/DD"
+        placeholder="انتخاب تاریخ"
+        containerClassName="w-100"
+        inputClass="custom-date-input"
+      />
+    </div>
+  </div>
 
-        <div className="filter-group">
-          <label>ترتیب نمایش</label>
-          <select
-            className='select-option'
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
-            <option value="newest">جدیدترین</option>
-            <option value="oldest">قدیمی‌ترین</option>
-          </select>
-        </div>
-      </div>
+  <div className="filter-group">
+    <label>ترتیب نمایش</label>
+    <select
+      className='select-option'
+      value={sortOrder}
+      onChange={(e) => setSortOrder(e.target.value)}
+    >
+      <option value="newest">جدیدترین</option>
+      <option value="oldest">قدیمی‌ترین</option>
+    </select>
+  </div>
+</div>
 
       {transactions.length > 0 && !isLoading && !error && (
         <div className="title">
           <div>تاریخ</div>
-          <div>درآمد</div>
-          <div>هزینه</div>
+          <div>درآمد(تومان)</div>
+          <div>هزینه(تومان)</div>
           <div>شرح</div>
         </div>
       )}
