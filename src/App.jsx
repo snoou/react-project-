@@ -25,7 +25,7 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route index element={<Navigate to="dashboard" />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="expenses" element={<TransactionTable />} />
               <Route path="*" element={<NotFound />} />

@@ -8,7 +8,6 @@ import Delete from '../../assets/icon/Delete.png';
 import PlusIcon from '../../assets/icon/Plus.png';
 import Edit from '../../assets/icon/Edit.png';
 import More from '../../assets/icon/More.png';
-import CalendarIcon from '../../assets/icon/Calendar.png';
 
 import ToPersian from '../../utils/ToPersian';
 
@@ -246,51 +245,51 @@ const TransactionTable = () => {
         </button>
       </div>
 
-     <div className="filters-container">
-  <div className="filter-group">
-    <label>از تاریخ</label>
-    <div className="input-with-icon">
-      <DatePicker
-        value={startDate}
-        onChange={setStartDate}
-        calendar={persian}
-        locale={persian_fa}
-        format="YYYY/MM/DD"
-        placeholder="انتخاب تاریخ"
-        containerClassName="w-100" 
-        inputClass="custom-date-input" 
-      />
-    </div>
-  </div>
+      <div className="filters-container">
+        <div className="filter-group">
+          <label>از تاریخ</label>
+          <div className="input-with-icon">
+            <DatePicker
+              value={startDate}
+              onChange={setStartDate}
+              calendar={persian}
+              locale={persian_fa}
+              format="YYYY/MM/DD"
+              placeholder="انتخاب تاریخ"
+              containerClassName="w-100"
+              inputClass="custom-date-input"
+            />
+          </div>
+        </div>
 
-  <div className="filter-group">
-    <label>تا تاریخ</label>
-    <div className="input-with-icon">
-      <DatePicker
-        value={endDate}
-        onChange={setEndDate}
-        calendar={persian}
-        locale={persian_fa}
-        format="YYYY/MM/DD"
-        placeholder="انتخاب تاریخ"
-        containerClassName="w-100"
-        inputClass="custom-date-input"
-      />
-    </div>
-  </div>
+        <div className="filter-group">
+          <label>تا تاریخ</label>
+          <div className="input-with-icon">
+            <DatePicker
+              value={endDate}
+              onChange={setEndDate}
+              calendar={persian}
+              locale={persian_fa}
+              format="YYYY/MM/DD"
+              placeholder="انتخاب تاریخ"
+              containerClassName="w-100"
+              inputClass="custom-date-input"
+            />
+          </div>
+        </div>
 
-  <div className="filter-group">
-    <label>ترتیب نمایش</label>
-    <select
-      className='select-option'
-      value={sortOrder}
-      onChange={(e) => setSortOrder(e.target.value)}
-    >
-      <option value="newest">جدیدترین</option>
-      <option value="oldest">قدیمی‌ترین</option>
-    </select>
-  </div>
-</div>
+        <div className="filter-group">
+          <label>ترتیب نمایش</label>
+          <select
+            className='select-option'
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="newest">جدیدترین</option>
+            <option value="oldest">قدیمی‌ترین</option>
+          </select>
+        </div>
+      </div>
 
       {transactions.length > 0 && !isLoading && !error && (
         <div className="title">
